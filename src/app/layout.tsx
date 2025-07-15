@@ -6,8 +6,17 @@ import Footer from '@/components/Layout/Footer'
 import { ThemeProvider } from 'next-themes'
 import ScrollToTop from '@/components/ScrollToTop'
 import Aoscompo from '@/utils/aos'
+import { Metadata } from 'next'
 
 const font = DM_Sans({ subsets: ['latin'] })
+
+export const metadata: Metadata = {
+  title: {
+    default: 'OpenVoiceX',
+    template: '%s | OpenVoiceX'
+  },
+  description: 'Next generation voice agent platform',
+}
 
 export default function RootLayout({
   children,

@@ -7,8 +7,10 @@ import Portfolio from '@/components/Home/portfolio'
 import Upgrade from '@/components/Home/upgrade'
 import Perks from '@/components/Home/perks'
 import { Metadata } from 'next'
+
 export const metadata: Metadata = {
-  title: 'CrypGo',
+  title: 'OpenVoiceX',
+  description: 'Next generation voice agent platform',
 }
 
 export default function Home() {
