@@ -1,19 +1,22 @@
-import Image from "next/image";
-import Link from "next/link";
+'use client'
+import Image from 'next/image'
+import Link from 'next/link'
 
-const Logo: React.FC = () => {
+export const Logo = () => {
   return (
-    <Link href="/">
+    <Link href='/' className='flex items-center gap-2'>
       <Image
-        src="/images/logo/logo.svg"
-        alt="logo"
-        width={160}
-        height={50}
-        style={{ width: "auto", height: "auto" }}
-        quality={100}
+        src='/images/logo/logo.png'
+        alt='OpenVoiceX logo'
+        width={120}
+        height={40}
+        className='w-[40px] h-auto md:w-[45px]'
+        style={{ objectFit: 'contain' }}
+        priority
       />
+      <span className="text-xl font-semibold text-gray-800 dark:text-white">
+        Open<span className="text-primary">Voice</span>X
+      </span>
     </Link>
-  );
-};
-
-export default Logo;
+  )
+}

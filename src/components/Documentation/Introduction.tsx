@@ -1,4 +1,4 @@
-'use client'
+         'use client'
 import Image from 'next/image'
 import { Icon } from '@iconify/react/dist/iconify.js'
 import { useState } from 'react'
@@ -38,6 +38,7 @@ export const Introduction = () => {
       version: '5.6.3',
     },
   ]
+
   return (
     <>
       <div id='version' className='md:scroll-m-[180px] scroll-m-28'>
@@ -49,11 +50,10 @@ export const Introduction = () => {
         )}
 
         <div className='flex item-center justify-between'>
-          <h3 className=' text-2xl mt-4 font-semibold mb-6 text-white'>
-            Pacakge Versions
+          <h3 className='text-2xl mt-4 font-semibold mb-6 text-white'>
+            Developer Guide: Voice Marketing Agents Frontend
           </h3>
           <button onClick={() => setDocNavbarOpen(true)} className='p-0'>
-            {' '}
             <Icon icon='gg:menu-right' className='text-3xl lg:hidden block' />
           </button>
         </div>
@@ -70,7 +70,7 @@ export const Introduction = () => {
                     width={64}
                     height={64}
                     alt='npm-package'
-                    className=' mx-auto w-10 h-10 '
+                    className='mx-auto w-10 h-10'
                   />
                   <h5 className='text-2xl font-bold mt-3.5 text-white'>{`v${item.version}`}</h5>
                   <p className='text-base font-medium text-muted'>
@@ -80,52 +80,69 @@ export const Introduction = () => {
               )
             })}
         </div>
-        <div className='mt-5'>
-          <p className='text-base font-medium text-muted/60'>
-            Crypgo Tailwind NextJs Template is built with Tailwindcss and
-            Nextjs.
-          </p>
-          <p className='text-base font-medium text-muted/60'>
-            These theme is ready to use and you can totally customize as per
-            your requirement.
-          </p>
-          <p className='text-base font-medium text-muted/60'>
-            For Customize, You should have knowledge of NextJs, ReactJs,
-            Tailwind and JSX to be able to modify these template.
-          </p>
-        </div>
-      </div>
 
-      <div
-        className={`lg:hidden block fixed top-0 right-0 h-full w-full bg-white dark:bg-dark shadow-lg transform transition-transform duration-300 max-w-xs ${docNavbarOpen ? 'translate-x-0' : 'translate-x-full'
-          } z-50`}>
-        <div className='flex items-center justify-between p-4'>
-          <h2 className='text-lg font-bold text-midnight_text dark:text-white'>
-            Docs Menu
-          </h2>
-          <button
-            onClick={() => setDocNavbarOpen(false)}
-            aria-label='Close mobile menu'>
-            <svg
-              xmlns='http://www.w3.org/2000/svg'
-              width='24'
-              height='24'
-              viewBox='0 0 24 24'
-              className='dark:text-white'>
-              <path
-                fill='none'
-                stroke='currentColor'
-                strokeLinecap='round'
-                strokeLinejoin='round'
-                strokeWidth='2'
-                d='M6 18L18 6M6 6l12 12'
-              />
-            </svg>
-          </button>
+        <div className='mt-8 text-muted/60'>
+          <h4 className='text-xl font-semibold mb-4 text-white'>The Big Picture: Where You Fit In</h4>
+          <p className='mb-4'>
+            Our project is a multi-service application focused on Voice Marketing Agents. Your primary focus will be on the Frontend Dashboard - the user interface where clients manage their AI agents.
+          </p>
+
+          <h5 className='text-lg font-semibold mb-3 text-white'>Key Responsibilities:</h5>
+          <ul className='list-disc pl-6 mb-6'>
+            <li>Create and configure AI agents</li>
+            <li>Manage call campaigns (future feature)</li>
+            <li>View analytics and call logs (future feature)</li>
+          </ul>
+
+          <h4 className='text-xl font-semibold mb-4 text-white'>System Architecture</h4>
+          <p className='mb-6'>
+            The frontend communicates with our backend services through a REST API, managing agent configurations and user interactions.
+          </p>
+
+          <h4 className='text-xl font-semibold mb-4 text-white'>Development Stack</h4>
+          <p className='mb-4'>
+            We use a modern, high-performance frontend stack with the following key technologies:
+          </p>
+          <ul className='list-disc pl-6 mb-6'>
+            <li>Next.js for server-side rendering and routing</li>
+            <li>React for component-based UI development</li>
+            <li>TypeScript for type safety</li>
+            <li>Tailwind CSS for styling</li>
+            <li>NextAuth for authentication</li>
+          </ul>
         </div>
-        <nav className='px-4'>
-          <DocNavigation />
-        </nav>
+
+        {docNavbarOpen && (
+          <div className='lg:hidden block fixed top-0 right-0 h-full w-full bg-white dark:bg-dark shadow-lg transform transition-transform duration-300 max-w-xs z-50'>
+            <div className='flex items-center justify-between p-4'>
+              <h2 className='text-lg font-bold text-midnight_text dark:text-white'>
+                Docs Menu
+              </h2>
+              <button
+                onClick={() => setDocNavbarOpen(false)}
+                aria-label='Close mobile menu'>
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  width='24'
+                  height='24'
+                  viewBox='0 0 24 24'
+                  className='dark:text-white'>
+                  <path
+                    fill='none'
+                    stroke='currentColor'
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth='2'
+                    d='M6 18L18 6M6 6l12 12'
+                  />
+                </svg>
+              </button>
+            </div>
+            <nav className='px-4'>
+              <DocNavigation />
+            </nav>
+          </div>
+        )}
       </div>
     </>
   )

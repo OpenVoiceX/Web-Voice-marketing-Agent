@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 
 export const DocNavigation = () => {
-  const [navItem, setNavItem] = useState('version')
+  const [navItem, setNavItem] = useState('overview')
 
   function getNavItem(item: string) {
     setNavItem(item)
@@ -16,23 +16,28 @@ export const DocNavigation = () => {
   const DocsNav = [
     {
       id: 1,
-      navItem: 'Package Versions',
-      hash: 'version',
+      navItem: 'Overview & Stack',
+      hash: 'overview',
     },
     {
       id: 2,
-      navItem: 'Pacakge Structure',
-      hash: 'structure',
-    },
-    {
-      id: 3,
-      navItem: 'Quick Start',
+      navItem: 'Getting Started',
       hash: 'start',
     },
     {
+      id: 3,
+      navItem: 'Project Structure',
+      hash: 'structure',
+    },
+    {
       id: 4,
-      navItem: 'Project Configuration',
+      navItem: 'Configuration',
       hash: 'configuration',
+    },
+    {
+      id: 5,
+      navItem: 'API Integration',
+      hash: 'api',
     },
   ]
 
@@ -44,7 +49,7 @@ export const DocNavigation = () => {
             key={item.id}
             href={`#${item.hash}`}
             onClick={() => getNavItem(item.hash)}
-            className={`py-2.5 hover:bg-primary/20 hover:text-primary dark:hover:text-primary xl:min-w-60 lg:min-w-52 min-w-full px-4 rounded-md text-base font-medium  ${
+            className={`py-2.5 hover:bg-primary/20 hover:text-primary dark:hover:text-primary xl:min-w-60 lg:min-w-52 min-w-full px-4 rounded-md text-base font-medium ${
               item.hash === navItem
                 ? 'bg-primary text-darkmode'
                 : 'text-muted/60'

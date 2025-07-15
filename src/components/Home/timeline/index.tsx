@@ -1,19 +1,9 @@
 'use client'
 import Image from 'next/image'
 import { timelineData } from '@/app/api/data'
-import { motion, useInView } from 'framer-motion'
-import { useRef } from 'react'
+import { motion } from 'framer-motion'
 
 const TimeLine = () => {
-  const ref = useRef(null)
-  const inView = useInView(ref)
-
-  const TopAnimation = {
-    initial: { y: '-100%', opacity: 0 },
-    animate: inView ? { y: 0, opacity: 1 } : { y: '-100%', opacity: 0 },
-    transition: { duration: 0.6, delay: 0.4 },
-  }
-
   return (
     <section className="md:pt-40 pt-9" id="development">
       <div className="container lg:px-16 px-4">
@@ -50,7 +40,7 @@ const TimeLine = () => {
                 <div className="text-right">
                   <h5 className="text-muted text-28 mb-3">Concept Design</h5>
                   <p className="text-18 text-muted/60">
-                    Define the voice agent's purpose and features
+                    Define the voice agent purpose and features
                   </p>
                 </div>
                 <div className="bg-light_grey/45 backdrop-blur-xs px-6 py-2 h-fit rounded-full">
@@ -80,7 +70,7 @@ const TimeLine = () => {
                 <div className="text-right">
                   <h5 className="text-muted text-28 mb-3">Testing</h5>
                   <p className="text-18 text-muted/60">
-                    Test the voice agent's performance and accuracy
+                    Test the voice agent performance and accuracy
                   </p>
                 </div>
                 <div className="bg-light_grey/45 backdrop-blur-xs px-6 py-2 h-fit rounded-full">

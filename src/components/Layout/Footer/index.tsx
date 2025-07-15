@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { footerlabels } from '@/app/api/data'
 import { headerData } from '../Header/Navigation/menuData'
 import { Icon } from '@iconify/react'
-import Logo from '../Header/Logo'
+import { Logo } from '../Header/Logo'
 
 const Footer: React.FC = () => {
   return (
