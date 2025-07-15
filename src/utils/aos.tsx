@@ -1,20 +1,34 @@
 'use client'
 import { useEffect } from "react";
-import AOS from "aos"
+import AOS from 'aos';
 import 'aos/dist/aos.css';
 
-const Aoscompo = ({children}:any) => {
-    useEffect(() => {
-        AOS.init({
-            duration: 800,
-            once: false,
-        })
-    }, [])
-  return (
-    <div>
-      {children}
-    </div>
-  )
+interface AosInstance {
+  init: (config?: AosConfig) => void;
 }
 
-export default Aoscompo
+interface AosConfig {
+  duration?: number;
+  easing?: string;
+  once?: boolean;
+  offset?: number;
+  delay?: number;
+}
+
+interface AosComponentProps {
+  children: React.ReactNode;
+}
+
+const Aoscompo = ({ children }: AosComponentProps) => {
+  useEffect(() => {
+    const aos = AOS as AosInstance;
+    aos.init({
+      duration: 800,
+      once: false,
+    });
+  }, []);
+
+  return <div>{children}</div>;
+};
+
+export default Aoscompo;

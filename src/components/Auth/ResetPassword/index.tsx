@@ -7,14 +7,28 @@ import Loader from '@/components/Common/Loader'
 import Link from 'next/link'
 import Image from 'next/image'
 
+interface FormData {
+  newPassword: string;
+  ReNewPassword: string;
+}
+
+interface User {
+  email: string;
+}
+
+interface ApiError {
+  response?: {
+    data?: string;
+  };
+}
+
 const ResetPassword = ({ token }: { token: string }) => {
-  const [data, setData] = useState({
+  const [data, setData] = useState<FormData>({
     newPassword: '',
     ReNewPassword: '',
   })
   const [loader, setLoader] = useState(false)
-
-  const [user, setUser] = useState({
+  const [user, setUser] = useState<User>({
     email: '',
   })
 
@@ -32,8 +46,9 @@ const ResetPassword = ({ token }: { token: string }) => {
             email: res.data.email,
           })
         }
-      } catch (error: any) {
-        toast.error(error?.response?.data)
+      } catch (error) {
+        const apiError = error as ApiError
+        toast.error(apiError?.response?.data || 'Token verification failed')
         router.push('/forgot-password')
       }
     }
@@ -55,6 +70,13 @@ const ResetPassword = ({ token }: { token: string }) => {
 
     if (data.newPassword === '') {
       toast.error('Please enter your password.')
+      setLoader(false)
+      return
+    }
+
+    if (data.newPassword !== data.ReNewPassword) {
+      toast.error('Passwords do not match.')
+      setLoader(false)
       return
     }
 
@@ -69,10 +91,10 @@ const ResetPassword = ({ token }: { token: string }) => {
         setData({ newPassword: '', ReNewPassword: '' })
         router.push('/signin')
       }
-
-      setLoader(false)
-    } catch (error: any) {
-      toast.error(error.response.data)
+    } catch (error) {
+      const apiError = error as ApiError
+      toast.error(apiError?.response?.data || 'Failed to update password')
+    } finally {
       setLoader(false)
     }
   }

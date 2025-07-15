@@ -8,7 +8,7 @@ export const PackageStructure = () => {
       </h3>
       <div className='rounded-md p-6 border border-dark_border/60 mt-6'>
         <p className='text-base font-medium text-muted/60 mb-6'>
-          All frontend code is organized in the src/ directory. Here's a guide to the main directories and their purposes:
+          All frontend code is organized in the src/ directory. Here&apos;s a guide to the main directories and their purposes:
         </p>
 
         <div className='space-y-6'>

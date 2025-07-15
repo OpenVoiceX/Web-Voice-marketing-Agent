@@ -7,16 +7,21 @@ import Loader from '@/components/Common/Loader'
 import Link from 'next/link'
 import Image from 'next/image'
 
+interface ApiError {
+  response?: {
+    data?: string;
+  };
+}
+
 const ForgotPassword = () => {
   const [email, setEmail] = useState('')
   const [loader, setLoader] = useState(false)
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     if (!email) {
       toast.error('Please enter your email address.')
-
       return
     }
 
@@ -39,8 +44,9 @@ const ForgotPassword = () => {
 
       setEmail('')
       setLoader(false)
-    } catch (error: any) {
-      toast.error(error?.response.data)
+    } catch (error) {
+      const apiError = error as ApiError
+      toast.error(apiError?.response?.data || 'An error occurred')
       setLoader(false)
     }
   }

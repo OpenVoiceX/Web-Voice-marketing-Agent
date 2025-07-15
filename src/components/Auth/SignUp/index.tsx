@@ -6,35 +6,58 @@ import SocialSignUp from '../SocialSignUp'
 import { Logo } from '@/components/Layout/Header/Logo'
 import { useState } from 'react'
 import Loader from '@/components/Common/Loader'
+
+interface SignUpData {
+  name: string;
+  email: string;
+  password: string;
+}
+
 const SignUp = () => {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
+  const [formData, setFormData] = useState<SignUpData>({
+    name: '',
+    email: '',
+    password: ''
+  })
 
-  const handleSubmit = (e: any) => {
-    e.preventDefault()
-
-    setLoading(true)
-    const data = new FormData(e.currentTarget)
-    const value = Object.fromEntries(data.entries())
-    const finalData = { ...value }
-
-    fetch('/api/register', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(finalData),
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
     })
-      .then((res) => res.json())
-      .then((data) => {
-        toast.success('Successfully registered')
-        setLoading(false)
-        router.push('/signin')
+  }
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    setLoading(true)
+
+    try {
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
       })
-      .catch((err) => {
+
+      if (!response.ok) {
+        throw new Error('Registration failed')
+      }
+
+      await response.json()
+      toast.success('Successfully registered')
+      router.push('/signin')
+    } catch (err) {
+      if (err instanceof Error) {
         toast.error(err.message)
-        setLoading(false)
-      })
+      } else {
+        toast.error('Registration failed')
+      }
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -57,6 +80,8 @@ const SignUp = () => {
             type='text'
             placeholder='Name'
             name='name'
+            value={formData.name}
+            onChange={handleChange}
             required
             className='w-full rounded-md border border-dark_border/60 border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition placeholder:text-grey focus:border-primary focus-visible:shadow-none text-white dark:focus:border-primary'
           />
@@ -66,6 +91,8 @@ const SignUp = () => {
             type='email'
             placeholder='Email'
             name='email'
+            value={formData.email}
+            onChange={handleChange}
             required
             className='w-full rounded-md border border-dark_border/60 border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition placeholder:text-grey focus:border-primary focus-visible:shadow-none text-white dark:focus:border-primary'
           />
@@ -75,6 +102,8 @@ const SignUp = () => {
             type='password'
             placeholder='Password'
             name='password'
+            value={formData.password}
+            onChange={handleChange}
             required
             className='w-full rounded-md border border-dark_border/60 border-solid bg-transparent px-5 py-3 text-base text-dark outline-hidden transition placeholder:text-grey focus:border-primary focus-visible:shadow-none text-white dark:focus:border-primary'
           />
@@ -82,26 +111,27 @@ const SignUp = () => {
         <div className='mb-9'>
           <button
             type='submit'
-            className='flex w-full items-center text-18 font-medium justify-center rounded-md bg-primary px-5 py-3 text-darkmode transition duration-300 ease-in-out hover:bg-transparent hover:text-primary border-primary border '>
-            Sign Up {loading && <Loader />}
+            disabled={loading}
+            className='flex w-full items-center text-18 font-medium justify-center rounded-md bg-primary px-5 py-3 text-darkmode transition duration-300 ease-in-out hover:bg-transparent hover:text-primary border-primary border disabled:opacity-50'>
+            {loading ? 'Signing up...' : 'Sign Up'} {loading && <Loader />}
           </button>
         </div>
       </form>
 
       <p className='text-body-secondary mb-4 text-white text-base'>
         By creating an account you are agree with our{' '}
-        <a href='/#' className='text-primary hover:underline'>
+        <Link href='/privacy' className='text-primary hover:underline'>
           Privacy
-        </a>{' '}
+        </Link>{' '}
         and{' '}
-        <a href='/#' className='text-primary hover:underline'>
+        <Link href='/terms' className='text-primary hover:underline'>
           Policy
-        </a>
+        </Link>
       </p>
 
       <p className='text-body-secondary text-white text-base'>
-        Already have an account?
-        <Link href='/' className='pl-2 text-primary hover:underline'>
+        Already have an account?{' '}
+        <Link href='/signin' className='text-primary hover:underline'>
           Sign In
         </Link>
       </p>

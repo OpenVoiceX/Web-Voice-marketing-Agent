@@ -1,8 +1,3 @@
-import { ColorConfiguration } from './ColorConfiguraion'
-import { LogoConfiguration } from './LogoConfiguration'
-import { TypographyConfiguration } from './TypographyConfiguration'
-import { APIConfiguration } from './APIConfiguration'
-
 export const Configuration = () => {
   return (
     <>

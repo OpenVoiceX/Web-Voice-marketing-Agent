@@ -3,40 +3,41 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import toast from "react-hot-toast";
 import { validateEmail } from "../../../utils/validateEmail";
-import Loader from "@/components/Common/Loader";
 
 const MagicLink = () => {
   const [email, setEmail] = useState("");
-  const [loader, setLoader] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = (e: any) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!email) {
       return toast.error("Please enter your email address.");
     }
 
-    setLoader(true);
+    setIsLoading(true);
     if (!validateEmail(email)) {
-      setLoader(false);
+      setIsLoading(false);
       return toast.error("Please enter a valid email address.");
-    } else {
-      signIn("email", {
+    }
+
+    try {
+      const result = await signIn("email", {
         redirect: false,
         email: email,
-      })
-        .then((callback) => {
-          if (callback?.ok) {
-            toast.success("Email sent");
-            setEmail("");
-            setLoader(false);
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-          toast.error("Unable to send email!");
-          setLoader(false);
-        });
+      });
+      
+      if (result?.ok) {
+        toast.success("Email sent");
+        setEmail("");
+      } else {
+        toast.error("Failed to send email");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Unable to send email!");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -56,9 +57,10 @@ const MagicLink = () => {
       <div className="mb-9">
         <button
           type="submit"
-          className="flex w-full cursor-pointer items-center justify-center rounded-md border border-primary bg-[#102C46] px-5 py-3 text-base text-white transition duration-300 ease-in-out hover:bg-[#102C46]"
+          disabled={isLoading}
+          className="flex w-full cursor-pointer items-center justify-center rounded-md border border-primary bg-[#102C46] px-5 py-3 text-base text-white transition duration-300 ease-in-out hover:bg-[#102C46] disabled:opacity-50"
         >
-          Send Magic Link 
+          {isLoading ? "Sending..." : "Send Magic Link"}
         </button>
       </div>
     </form>

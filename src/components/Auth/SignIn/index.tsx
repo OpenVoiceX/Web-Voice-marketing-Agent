@@ -8,40 +8,49 @@ import SocialSignIn from '../SocialSignIn'
 import { Logo } from '@/components/Layout/Header/Logo'
 import Loader from '@/components/Common/Loader'
 
-const Signin = () => {
+interface LoginData {
+  email: string;
+  password: string;
+  checkboxToggle: boolean;
+}
+
+const SignIn = () => {
   const router = useRouter()
 
-  const [loginData, setLoginData] = useState({
+  const [loginData, setLoginData] = useState<LoginData>({
     email: '',
     password: '',
     checkboxToggle: false,
   })
   const [loading, setLoading] = useState(false)
 
-  const loginUser = (e: any) => {
+  const loginUser = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     setLoading(true)
-    signIn('credentials', { ...loginData, redirect: false })
-      .then((callback) => {
-        if (callback?.error) {
-          toast.error(callback?.error)
-          console.log(callback?.error)
-          setLoading(false)
-          return
-        }
-
-        if (callback?.ok && !callback?.error) {
-          toast.success('Login successful')
-          setLoading(false)
-          router.push('/')
-        }
-      })
-      .catch((err) => {
+    try {
+      const result = await signIn('credentials', { ...loginData, redirect: false })
+      if (result?.error) {
+        toast.error(result.error)
+        console.log(result.error)
         setLoading(false)
+        return
+      }
+
+      if (result?.ok && !result?.error) {
+        toast.success('Login successful')
+        setLoading(false)
+        router.push('/')
+      }
+    } catch (err) {
+      setLoading(false)
+      if (err instanceof Error) {
         console.log(err.message)
         toast.error(err.message)
-      })
+      } else {
+        toast.error('An error occurred')
+      }
+    }
   }
 
   return (
@@ -58,11 +67,12 @@ const Signin = () => {
         </span>
       </span>
 
-      <form onSubmit={(e) => e.preventDefault()}>
+      <form onSubmit={loginUser}>
         <div className='mb-[22px]'>
           <input
             type='email'
             placeholder='Email'
+            value={loginData.email}
             onChange={(e) =>
               setLoginData({ ...loginData, email: e.target.value })
             }
@@ -73,6 +83,7 @@ const Signin = () => {
           <input
             type='password'
             placeholder='Password'
+            value={loginData.password}
             onChange={(e) =>
               setLoginData({ ...loginData, password: e.target.value })
             }
@@ -81,7 +92,6 @@ const Signin = () => {
         </div>
         <div className='mb-9'>
           <button
-            onClick={loginUser}
             type='submit'
             className='bg-primary w-full py-3 rounded-lg text-18 font-medium border border-primary hover:text-primary hover:bg-transparent'>
             Sign In {loading && <Loader />}
@@ -104,4 +114,4 @@ const Signin = () => {
   )
 }
 
-export default Signin
+export default SignIn
