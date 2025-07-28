@@ -1,7 +1,7 @@
 import { HeaderItem } from "@/types/menu";
 
 export const headerData: HeaderItem[] = [
-  { label: "Buy & Sell", href: "/#main-banner" },
+  { label: "Home", href: "/#main-banner" },
   { label: "Development", href: "/#development" },
   { label: "Work", href: "/#work" },
   { label: "Portfolio", href: "/#portfolio" },
