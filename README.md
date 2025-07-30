@@ -337,7 +337,7 @@ npm run dev
 
 
 
-### [🎗 License]
+### 🎗 License
 [MIT](https://choosealicense.com/licenses/mit/)    
 
 [🙌 Acknowledgments](#-acknowledgments): https://github.com/mashrufmohd
