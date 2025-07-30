@@ -340,8 +340,9 @@ npm run dev
 ### 🎗 License
 [MIT](https://choosealicense.com/licenses/mit/)    
 
-[🙌 Acknowledgments](#-acknowledgments): https://github.com/mashrufmohd
+### 🙌 Acknowledgments(#-acknowledgments):
+  https://github.com/mashrufmohd
 
-## Contributing
-[🙌 Acknowledgments]: https://github.com/Jha-2022
+### 🔰 Contributing:
+  https://github.com/Jha-2022
 
