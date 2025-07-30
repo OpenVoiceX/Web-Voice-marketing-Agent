@@ -32,6 +32,8 @@ This website acts as your launchpad—navigate to the project that matches your 
 - **Showcase Potential**: Highlights the capabilities of both frameworks with live demos and documentation links.
 
 File Structure:
+
+```
 web-voice-marketing-agent/
 ├── public/
 │   ├── images/
@@ -57,6 +59,8 @@ web-voice-marketing-agent/
 ├── tsconfig.json          # Optional
 └── tailwind.config.js
 
+```
+
 ## 🏗️ System Architecture
 
 **Web-Voice-Marketing-Agent** is a lightweight web application built to serve as a landing page, with integration points for both frameworks.
@@ -70,9 +74,13 @@ web-voice-marketing-agent/
 
 *Architecture Diagram* (Placeholder for visual representation):
 
+```
+
 [Frontend: React/Next.js] <--> [Optional Backend: Node.js]
 <--> [Voice Marketing Agents: Docker/FastAPI]
 <--> [DialogWeaver: Docker/FastAPI]
+
+```
 
 ---
 
@@ -108,4 +116,4 @@ Get **Web-Voice-Marketing-Agent** running locally to explore both frameworks.
   locally and connect via the landing page links.   
 
 💖 Contributing
-    Web-Voice-Marketing-Agent is a community effort to create a welcoming entry point for voice AI enthusiasts. Contributions are encouraged!
+      Web-Voice-Marketing-Agent is a community effort to create a welcoming entry point for voice AI enthusiasts. Contributions are encouraged!
