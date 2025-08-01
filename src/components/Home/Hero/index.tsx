@@ -47,20 +47,6 @@ const Hero = () => {
               Create and Deploy <span className="text-primary">Voice Agents</span> for your{' '}
               <span className="text-primary">Business</span>!
             </h1>
-            <div className="flex items-center md:justify-start justify-center gap-8">
-              <Link
-                href="/signup"
-                className="bg-primary border border-primary rounded-lg text-21 font-medium hover:bg-transparent hover:text-primary text-darkmode py-2 px-7 z-50"
-              >
-                Create Agent
-              </Link>
-              <Link
-                href="/documentation"
-                className="bg-transparent border border-primary rounded-lg text-21 font-medium hover:bg-primary hover:text-darkmode text-primary py-2 px-7"
-              >
-                Learn More
-              </Link>
-            </div>
             <div className="flex items-center md:justify-start justify-center gap-12 mt-20">
               <Link 
                 href="https://github.com/your-repo" 

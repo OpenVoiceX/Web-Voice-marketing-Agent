@@ -2,7 +2,7 @@
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 
-const VoiceAgentFeatures = () => {
+const DialogWeaverFeatures = () => {
   return (
     <section className="md:pt-48 sm:pt-28 pt-12" id="features">
       <div className="container px-4 sm:px-6">
@@ -15,7 +15,7 @@ const VoiceAgentFeatures = () => {
           >
             <Image
               src="/images/portfolio/ChatGPT Image Jul 14, 2025, 10_35_08 PM (1)-Photoroom.png"
-              alt="Voice Agent Features"
+              alt="DialogWeaver Features"
               width={780}
               height={700}
             />
@@ -27,15 +27,15 @@ const VoiceAgentFeatures = () => {
             transition={{ duration: 0.6 }}
           >
             <p className="sm:text-28 text-18 text-muted mb-4">
-              Voice Agent <span className="text-primary">Features</span>
+              DialogWeaver <span className="text-primary">Features</span>
             </p>
             <h2 className="text-white sm:text-40 text-30 mb-4 font-medium">
-              Explore key features of Voice
-              <span className="text-primary">Go</span>!
+              Explore key features of
+              <span className="text-primary">DialogWeaver</span>!
             </h2>
             <p className="text-muted/60 text-18">
-              VoiceGo provides advanced tools to develop and manage
-              <br className="md:block hidden" /> cutting-edge voice agent solutions.
+              DialogWeaver empowers developers and businesses to
+              <br className="md:block hidden" /> create sophisticated, real-time voice AI assistants with ease.
             </p>
 
             <table className="w-full sm:w-[80%]">
@@ -50,7 +50,7 @@ const VoiceAgentFeatures = () => {
                     </div>
                   </td>
                   <td className="py-5">
-                    <h4 className="text-muted sm:text-28 text-22 ml-5">Concept Design</h4>
+                    <h4 className="text-muted sm:text-28 text-22 ml-5">Real-Time Conversations</h4>
                   </td>
                 </tr>
                 <tr className="border-b border-dark_border/10">
@@ -64,7 +64,7 @@ const VoiceAgentFeatures = () => {
                     </div>
                   </td>
                   <td className="py-5">
-                    <h4 className="text-muted sm:text-28 text-22 ml-5">Voice Training</h4>
+                    <h4 className="text-muted sm:text-28 text-22 ml-5">Provider-Agnostic Integration</h4>
                   </td>
                 </tr>
                 <tr className="border-b border-dark_border/10">
@@ -77,7 +77,7 @@ const VoiceAgentFeatures = () => {
                     </div>
                   </td>
                   <td className="py-5">
-                    <h4 className="text-muted sm:text-28 text-22 ml-5">Testing</h4>
+                    <h4 className="text-muted sm:text-28 text-22 ml-5">No-Code UI Playground</h4>
                   </td>
                 </tr>
                 <tr className="border-b border-dark_border/10">
@@ -90,7 +90,7 @@ const VoiceAgentFeatures = () => {
                     </div>
                   </td>
                   <td className="py-5">
-                    <h4 className="text-muted sm:text-28 text-22 ml-5">Deployment</h4>
+                    <h4 className="text-muted sm:text-28 text-22 ml-5">Telephony & Web Support</h4>
                   </td>
                 </tr>
               </tbody>
@@ -102,4 +102,4 @@ const VoiceAgentFeatures = () => {
   )
 }
 
-export default VoiceAgentFeatures
+export default DialogWeaverFeatures
