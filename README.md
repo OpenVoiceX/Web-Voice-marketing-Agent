@@ -124,5 +124,22 @@ Thanks to these wonderful people:
 
 ---
 
+
+
+## 📜 Code of Conduct
+
+To ensure a welcoming and inclusive environment, we have a Code of Conduct that all contributors are expected to follow. In short: **Be respectful, be kind, and be collaborative.** Please read the full [Code of Conduct](./CODE_OF_CONDUCT.md) before participating.
+
+---
+
+Thank you again for your interest. We can't wait to see what you build with us!
+
+
+## 📜 License
+
+This project is freely available under the **MIT License**. See the `LICENSE` file for more information.
+
+---
 💖 Contributing
       Web-Voice-Marketing-Agent is a community effort to create a welcoming entry point for voice AI enthusiasts. Contributions are encouraged!
+
