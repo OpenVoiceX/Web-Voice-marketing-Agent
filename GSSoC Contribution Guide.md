@@ -29,6 +29,7 @@ Watch It:
 **Understanding Labels in GSSoC**
 
 Most GSSoC repositories use labels to mark contributor-friendly issues:
+```
 
 | **Label** | **Meaning** | **Points** |
 | --- | --- | --- |
@@ -37,7 +38,7 @@ GSSoC | Issue is part of GSSoC 2025 ✅ |  |
 | Level 1 | **Beginner-friendly.** Great for your first contribution! | 3 |
 | Level 2 | **Intermediate.** Requires some familiarity. | 7 |
 | Level 3 | **Advanced.** A significant and complex task. | 10 |
-
+```
 **Pro Tip:** Start with Easy or good first issue labels to get familiar with the codebase before tackling more complex tasks.
 
 **The Complete Contribution Workflow                            (with Commands)**
