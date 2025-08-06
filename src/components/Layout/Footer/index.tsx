@@ -3,8 +3,13 @@ import Link from 'next/link'
 import { Icon } from '@iconify/react'
 import { motion } from 'framer-motion'
 import { Logo } from '../Header/Logo'
+import { useState } from 'react'
+import toast from 'react-hot-toast'
 
 const Footer: React.FC = () => {
+  const [email, setEmail] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
   const headerLinks = [
     { label: 'Home', href: '/' },
     { label: 'Features', href: '#features' },
@@ -18,6 +23,49 @@ const Footer: React.FC = () => {
     { label: 'Issues', href: 'https://github.com/your-username/voice-marketing-agents/issues' },
     { label: 'Roadmap', href: 'https://github.com/your-username/voice-marketing-agents#roadmap' },
   ];
+
+  // Handle newsletter subscription
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email.trim()) {
+      toast.error('Please enter your email address');
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const response = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        toast.success('Successfully subscribed to our newsletter! 🎉');
+        setEmail(''); // Clear the input field
+      } else {
+        toast.error(data.error || 'Failed to subscribe. Please try again.');
+      }
+    } catch (error) {
+      console.error('Newsletter subscription error:', error);
+      toast.error('Failed to subscribe. Please check your connection and try again.');
+    } finally {
+      setIsSubmitting(false);
+      setEmail('')
+    }
+  };
 
   // Animation variants for subtle fade-in effects
   const containerVariants = {
@@ -113,21 +161,39 @@ const Footer: React.FC = () => {
             <p className="text-white/60 text-16 mb-4">
               Subscribe for the latest updates on<br />Voice Marketing Agents
             </p>
-            <div className="relative lg:w-4/5">
+            <form onSubmit={handleSubscribe} className="relative lg:w-4/5">
               <input
                 type="email"
                 name="mail"
                 id="mail"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="bg-dark_grey/50 border border-primary/30 py-3 px-5 text-white rounded-lg w-full focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all duration-300"
+                disabled={isSubmitting}
+                className="bg-dark_grey/50 border border-primary/30 py-3 px-5 text-white rounded-lg w-full focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
               />
-              <Icon
-                icon="tabler:send"
-                width="24"
-                height="24"
-                className="text-primary absolute right-4 bottom-3 cursor-pointer hover:scale-110 transition-transform duration-200"
-              />
-            </div>
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="absolute right-4 bottom-3 cursor-pointer hover:scale-110 transition-transform duration-200 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {isSubmitting ? (
+                  <Icon
+                    icon="eos-icons:loading"
+                    width="24"
+                    height="24"
+                    className="text-primary animate-spin"
+                  />
+                ) : (
+                  <Icon
+                    icon="tabler:send"
+                    width="24"
+                    height="24"
+                    className="text-primary"
+                  />
+                )}
+              </button>
+            </form>
           </motion.div>
         </motion.div>
 
