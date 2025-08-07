@@ -53,17 +53,46 @@ const Footer: React.FC = () => {
       const data = await response.json();
 
       if (response.ok) {
-        toast.success('Successfully subscribed to our newsletter! 🎉');
+        toast.success(data.message || 'Successfully subscribed to our newsletter! 🎉');
         setEmail(''); // Clear the input field
+        if (data.info) {
+          setTimeout(() => {
+            toast.success(data.info, { duration: 6000 });
+          }, 1000);
+        }
       } else {
-        toast.error(data.error || 'Failed to subscribe. Please try again.');
+        // Handle different error types
+        switch (response.status) {
+          case 429:
+            const retryAfter = data.retryAfter || 3600;
+            const retryTime = retryAfter > 60 
+              ? `${Math.ceil(retryAfter / 60)} minutes` 
+              : `${retryAfter} seconds`;
+            toast.error(`Too many attempts. Please try again in ${retryTime}.`);
+            break;
+          case 409:
+            toast.error(data.error || 'This email is already subscribed.');
+            if (data.message) {
+              setTimeout(() => {
+                toast(data.message, { 
+                  duration: 8000,
+                  icon: 'ℹ️' 
+                });
+              }, 1000);
+            }
+            break;
+          case 503:
+            toast.error('Service temporarily unavailable. Please try again later.');
+            break;
+          default:
+            toast.error(data.error || 'Failed to subscribe. Please try again.');
+        }
       }
     } catch (error) {
       console.error('Newsletter subscription error:', error);
       toast.error('Failed to subscribe. Please check your connection and try again.');
     } finally {
       setIsSubmitting(false);
-      setEmail('')
     }
   };
 
