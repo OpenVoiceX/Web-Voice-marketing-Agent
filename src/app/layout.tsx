@@ -7,6 +7,7 @@ import { ThemeProvider } from 'next-themes'
 import ScrollToTop from '@/components/ScrollToTop'
 import Aoscompo from '@/utils/aos'
 import { Metadata } from 'next'
+import { Toaster } from 'react-hot-toast'
 
 const font = DM_Sans({ subsets: ['latin'] })
 
@@ -33,6 +34,29 @@ export default function RootLayout({
             <Footer />
           </Aoscompo>
           <ScrollToTop />
+          <Toaster
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#333',
+                color: '#fff',
+                border: '1px solid #555',
+              },
+              success: {
+                style: {
+                  background: '#065f46',
+                  color: '#fff',
+                },
+              },
+              error: {
+                style: {
+                  background: '#dc2626',
+                  color: '#fff',
+                },
+              },
+            }}
+          />
         </ThemeProvider>
       </body>
     </html>
