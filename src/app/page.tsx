@@ -6,7 +6,7 @@ import Platform from '@/components/Home/platform'
 import Portfolio from '@/components/Home/portfolio'
 import Upgrade from '@/components/Home/upgrade'
 import Perks from '@/components/Home/perks'
-import Projects from '@/components/Home/projects'
+
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
@@ -18,7 +18,6 @@ export default function Home() {
   return (
     <main>
       <Hero />
-      <Projects />
       <Work />
       <TimeLine />
       <Platform />
