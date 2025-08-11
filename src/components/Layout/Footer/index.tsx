@@ -18,10 +18,10 @@ const Footer: React.FC = () => {
   ];
 
   const footerLinks = [
-    { label: 'Documentation', href: 'https://github.com/your-username/voice-marketing-agents/wiki' },
-    { label: 'Contribute', href: 'https://github.com/your-username/voice-marketing-agents/blob/main/CONTRIBUTING.md' },
-    { label: 'Issues', href: 'https://github.com/your-username/voice-marketing-agents/issues' },
-    { label: 'Roadmap', href: 'https://github.com/your-username/voice-marketing-agents#roadmap' },
+    { label: 'Documentation', href: 'https://github.com/OpenVoiceX/Web-Voice-marketing-Agent/blob/main/README.md' },
+    { label: 'Contributors', href: '/contributors' },
+    { label: 'Contribute', href: 'https://github.com/OpenVoiceX/Web-Voice-marketing-Agent/blob/main/CONTRIBUTING.md' },
+    { label: 'Issues', href: 'https://github.com/OpenVoiceX/Web-Voice-marketing-Agent/issues' },
   ];
 
   // Handle newsletter subscription
@@ -63,13 +63,14 @@ const Footer: React.FC = () => {
       } else {
         // Handle different error types
         switch (response.status) {
-          case 429:
+          case 429: {
             const retryAfter = data.retryAfter || 3600;
             const retryTime = retryAfter > 60 
               ? `${Math.ceil(retryAfter / 60)} minutes` 
               : `${retryAfter} seconds`;
             toast.error(`Too many attempts. Please try again in ${retryTime}.`);
             break;
+          }
           case 409:
             toast.error(data.error || 'This email is already subscribed.');
             if (data.message) {
@@ -128,7 +129,7 @@ const Footer: React.FC = () => {
               Build blazing-fast, open-source voice AI with Voice Marketing Agents.
             </p>
             <div className="flex gap-6 items-center mt-6">
-              <Link href="https://github.com/your-username/voice-marketing-agents" className="group transition-transform duration-300 hover:scale-110">
+              <Link href="https://github.com/OpenVoiceX/Web-Voice-marketing-Agent" className="group transition-transform duration-300 hover:scale-110">
                 <Icon
                   icon="fa6-brands:github"
                   width="28"
@@ -141,7 +142,7 @@ const Footer: React.FC = () => {
               © {new Date().getFullYear()} Voice Marketing Agents. All rights reserved.
             </p>
             <Link
-              href="https://github.com/your-username/voice-marketing-agents"
+              href="https://github.com/OpenVoiceX/Web-Voice-marketing-Agent"
               target="_blank"
               rel="noopener noreferrer"
               className="text-white/80 text-14 font-medium mt-2 hover:text-primary transition-colors block"
