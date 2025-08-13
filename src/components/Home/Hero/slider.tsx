@@ -12,7 +12,7 @@ const AgentSlider = () => {
     infinite: true,
     autoplaySpeed: 1500,
     speed: 300,
-    slidesToShow: 4,
+    slidesToShow: 3,
     slidesToScroll: 1,
     cssEase: 'ease-in-out',
     responsive: [
@@ -43,7 +43,7 @@ const AgentSlider = () => {
         {AgentFeatures.map((item, index) => (
           <div key={index} className="pr-6">
             <div className="px-5 py-6 bg-dark_grey/80 rounded-xl">
-              <div className="flex items-center gap-5">
+              <div className="flex items-center gap-5 hover:scale-105 transition-transform duration-300">
                 <div className={`${item.background} ${item.padding} rounded-full`}>
                   <Icon icon={item.icon} width={item.width} height={item.height} className="text-primary" />
                 </div>
