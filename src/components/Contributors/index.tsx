@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -24,11 +24,16 @@ interface Contributor {
   followers?: number
 }
 
+type FilterType = 'all' | 'core' | 'active' | 'new'
+
 const Contributors = () => {
   const [contributors, setContributors] = useState<Contributor[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedContributor, setSelectedContributor] = useState<Contributor | null>(null)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterType, setFilterType] = useState<FilterType>('all')
+  const [displayedCount, setDisplayedCount] = useState(8)
 
   useEffect(() => {
     fetchContributors()
@@ -75,6 +80,50 @@ const Contributors = () => {
     } finally {
       setLoading(false)
     }
+  }
+
+  // Filtered and searched contributors
+  const filteredContributors = useMemo(() => {
+    let filtered = contributors
+
+    // Apply search filter
+    if (searchTerm) {
+      filtered = filtered.filter(contributor =>
+        contributor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contributor.login.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contributor.bio?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contributor.company?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    }
+
+    // Apply category filter
+    switch (filterType) {
+      case 'core':
+        filtered = filtered.filter(c => c.contributions >= 10)
+        break
+      case 'active':
+        filtered = filtered.filter(c => c.contributions >= 5 && c.contributions < 10)
+        break
+      case 'new':
+        filtered = filtered.filter(c => c.contributions < 5)
+        break
+      default:
+        break
+    }
+
+    return filtered.sort((a, b) => b.contributions - a.contributions)
+  }, [contributors, searchTerm, filterType])
+
+  const displayedContributors = filteredContributors.slice(0, displayedCount)
+
+  const loadMore = () => {
+    setDisplayedCount(prev => Math.min(prev + 8, filteredContributors.length))
+  }
+
+  const getContributorRole = (contributions: number) => {
+    if (contributions >= 10) return 'Core Contributor'
+    if (contributions >= 5) return 'Active Contributor'
+    return 'New Contributor'
   }
 
   const containerVariants = {
@@ -140,108 +189,114 @@ const Contributors = () => {
   return (
     <>
       <section className="min-h-screen bg-dark text-white py-20">
-        {/* Header Section */}
-        <div className="container mx-auto px-4 mb-16">
+        {/* Header Section - Inspired by the image */}
+        <div className="container mx-auto px-4 mb-12">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-center"
+            className="text-center max-w-4xl mx-auto"
           >
-            <div className="flex items-center justify-center gap-4 mb-6 mt-14">
-              <Icon icon="mdi:account-group" className="text-primary text-5xl" />
-              <h1 className="text-5xl md:text-6xl font-bold">
-                Our Amazing <span className="text-primary">Contributors</span>
-              </h1>
-            </div>
-            <p className="text-xl text-white/80 max-w-3xl mx-auto mb-8">
-              Meet the incredible developers, designers, and community members who have contributed to making 
-              Voice Marketing Agents a reality. Together, we're building the future of voice AI technology.
+            <h1 className="text-5xl md:text-6xl font-bold mb-4 mt-20">
+              Contributor <span className="text-primary">Showcase</span>
+            </h1>
+            <p className="text-xl text-white/70 mb-12">
+              Meet the amazing people who have contributed to this project
             </p>
-            <div className="flex items-center justify-center gap-8 text-white/60">
-              <div className="flex items-center gap-2">
-                <Icon icon="mdi:github" className="text-2xl" />
-                <span>Open Source</span>
+
+            {/* Search and Filter Section - Inspired by the image */}
+            <div className="flex flex-col md:flex-row gap-4 items-center justify-center max-w-2xl mx-auto">
+              {/* Search Bar */}
+              <div className="relative flex-1 w-full md:w-auto">
+                <Icon icon="mdi:magnify" className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/50 text-xl" />
+                <input
+                  type="text"
+                  placeholder="Search contributors"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full bg-dark_grey/50 border border-white/20 rounded-xl py-4 pl-12 pr-4 text-white placeholder-white/50 focus:outline-none focus:border-primary transition-colors"
+                />
               </div>
-              <div className="flex items-center gap-2">
-                <Icon icon="mdi:heart" className="text-2xl text-error" />
-                <span>Community Driven</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Icon icon="mdi:rocket-launch" className="text-2xl" />
-                <span>Innovation Focused</span>
+
+              {/* Filter Dropdown */}
+              <div className="relative">
+                <select
+                  value={filterType}
+                  onChange={(e) => setFilterType(e.target.value as FilterType)}
+                  className="bg-dark_grey/50 border border-white/20 rounded-xl py-4 px-6 pr-12 text-white focus:outline-none focus:border-primary transition-colors appearance-none cursor-pointer min-w-[140px]"
+                >
+                  <option value="all">All Contributors</option>
+                  <option value="core">Core ({contributors.filter(c => c.contributions >= 10).length})</option>
+                  <option value="active">Active ({contributors.filter(c => c.contributions >= 5 && c.contributions < 10).length})</option>
+                  <option value="new">New ({contributors.filter(c => c.contributions < 5).length})</option>
+                </select>
+                <Icon icon="mdi:chevron-down" className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/50 pointer-events-none" />
               </div>
             </div>
+
+            {/* Results Count */}
+            {searchTerm && (
+              <p className="text-white/60 mt-4">
+                Found {filteredContributors.length} contributor{filteredContributors.length !== 1 ? 's' : ''} matching "{searchTerm}"
+              </p>
+            )}
           </motion.div>
         </div>
 
-        {/* Stats Section */}
-        <div className="container mx-auto px-4 mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto"
-          >
-            <div className="text-center p-6 bg-dark_grey/50 rounded-lg border border-primary/20">
-              <h3 className="text-3xl font-bold text-primary mb-2">{contributors.length}</h3>
-              <p className="text-white/80">Total Contributors</p>
-            </div>
-            <div className="text-center p-6 bg-dark_grey/50 rounded-lg border border-primary/20">
-              <h3 className="text-3xl font-bold text-primary mb-2">
-                {contributors.reduce((sum, contributor) => sum + contributor.contributions, 0)}
-              </h3>
-              <p className="text-white/80">Total Contributions</p>
-            </div>
-            <div className="text-center p-6 bg-dark_grey/50 rounded-lg border border-primary/20">
-              <h3 className="text-3xl font-bold text-primary mb-2">
-                {contributors.filter(c => c.contributions >= 10).length}
-              </h3>
-              <p className="text-white/80">Core Contributors</p>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Contributors Grid */}
+        {/* Contributors Grid - Clean design inspired by the image */}
         <div className="container mx-auto px-4">
           <motion.div
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-7xl mx-auto"
           >
-            {contributors.map((contributor) => (
+            {displayedContributors.map((contributor) => (
               <motion.div
                 key={contributor.id}
                 variants={itemVariants}
                 className="group cursor-pointer"
                 onClick={() => handleContributorClick(contributor)}
               >
-                <div className="bg-dark_grey/30 backdrop-blur-sm border border-primary/20 rounded-xl p-6 text-center hover:border-primary/50 hover:bg-dark_grey/50 transition-all duration-300 hover:scale-105">
-                  <div className="relative mb-4">
-                    <Image
-                      src={contributor.avatar_url}
-                      alt={`${contributor.login}'s avatar`}
-                      width={80}
-                      height={80}
-                      className="rounded-full mx-auto border-2 border-primary/30 group-hover:border-primary transition-colors"
-                    />
-                    <div className="absolute -bottom-2 -right-2 bg-primary text-dark text-xs font-bold px-2 py-1 rounded-full">
-                      {contributor.contributions}
+                <div className="bg-dark_grey/30 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center hover:border-primary/30 hover:bg-dark_grey/50 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/10">
+                  {/* Profile Image with Border */}
+                  <div className="relative mb-6">
+                    <div className="w-20 h-20 mx-auto rounded-full p-1 bg-gradient-to-r from-primary to-secondary">
+                      <Image
+                        src={contributor.avatar_url}
+                        alt={`${contributor.login}'s avatar`}
+                        width={76}
+                        height={76}
+                        className="rounded-full w-full h-full object-cover"
+                      />
                     </div>
                   </div>
-                  <h3 className="font-semibold text-white mb-1 truncate">
+
+                  {/* Name and Username */}
+                  <h3 className="font-bold text-white text-lg mb-1 truncate">
                     {contributor.name || contributor.login}
                   </h3>
-                  <p className="text-sm text-primary mb-2">@{contributor.login}</p>
+                  <p className="text-primary font-medium mb-3 text-sm">
+                    {getContributorRole(contributor.contributions)}
+                  </p>
+
+                  {/* Bio if available */}
                   {contributor.bio && (
-                    <p className="text-xs text-white/60 line-clamp-2">{contributor.bio}</p>
+                    <p className="text-white/60 text-sm mb-4 line-clamp-2 leading-relaxed">
+                      {contributor.bio}
+                    </p>
                   )}
-                  <div className="flex items-center justify-center gap-2 mt-3 text-xs text-white/60">
-                    {contributor.location && (
+
+                  {/* Stats */}
+                  <div className="flex items-center justify-center gap-4 text-xs text-white/50">
+                    <div className="flex items-center gap-1">
+                      <Icon icon="mdi:source-commit" />
+                      <span>{contributor.contributions}</span>
+                    </div>
+                    {contributor.public_repos && (
                       <div className="flex items-center gap-1">
-                        <Icon icon="mdi:map-marker" />
-                        <span className="truncate">{contributor.location}</span>
+                        <Icon icon="mdi:source-repository" />
+                        <span>{contributor.public_repos}</span>
                       </div>
                     )}
                   </div>
@@ -249,6 +304,29 @@ const Contributors = () => {
               </motion.div>
             ))}
           </motion.div>
+
+          {/* Load More Button - Inspired by the image */}
+          {displayedCount < filteredContributors.length && (
+            <div className="text-center mt-12">
+              <motion.button
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                onClick={loadMore}
+                className="bg-primary text-dark px-8 py-4 rounded-xl font-semibold hover:bg-primary/90 transition-all duration-300 hover:scale-105 shadow-lg"
+              >
+                Load More
+              </motion.button>
+            </div>
+          )}
+
+          {/* No Results Message */}
+          {filteredContributors.length === 0 && !loading && (
+            <div className="text-center py-20">
+              <Icon icon="mdi:account-search" className="text-white/30 text-6xl mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-white/70 mb-2">No contributors found</h3>
+              <p className="text-white/50">Try adjusting your search or filter criteria</p>
+            </div>
+          )}
         </div>
 
         {/* Call to Action */}
@@ -257,7 +335,7 @@ const Contributors = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.8 }}
-            className="text-center bg-gradient-to-r from-primary/20 to-secondary/20 rounded-2xl p-12 border border-primary/30"
+            className="text-center bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl p-12 border border-primary/20 max-w-4xl mx-auto"
           >
             <h2 className="text-3xl font-bold mb-4">
               Want to Join Our <span className="text-primary">Community</span>?
@@ -271,7 +349,7 @@ const Contributors = () => {
                 href="https://github.com/OpenVoiceX/Web-Voice-marketing-Agent"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-primary text-dark px-8 py-4 rounded-lg font-semibold hover:bg-primary/90 transition-colors inline-flex items-center gap-2"
+                className="bg-primary text-dark px-8 py-4 rounded-xl font-semibold hover:bg-primary/90 transition-colors inline-flex items-center gap-2 justify-center"
               >
                 <Icon icon="mdi:github" className="text-xl" />
                 View on GitHub
@@ -280,7 +358,7 @@ const Contributors = () => {
                 href="https://github.com/OpenVoiceX/Web-Voice-marketing-Agent/issues"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="border border-primary text-primary px-8 py-4 rounded-lg font-semibold hover:bg-primary hover:text-dark transition-colors inline-flex items-center gap-2"
+                className="border border-primary text-primary px-8 py-4 rounded-xl font-semibold hover:bg-primary hover:text-dark transition-colors inline-flex items-center gap-2 justify-center"
               >
                 <Icon icon="mdi:bug" className="text-xl" />
                 Report Issues
@@ -301,18 +379,23 @@ const Contributors = () => {
           >
             <div className="flex justify-between items-start mb-6">
               <div className="flex items-center gap-4">
-                <Image
-                  src={selectedContributor.avatar_url}
-                  alt={`${selectedContributor.login}'s avatar`}
-                  width={100}
-                  height={100}
-                  className="rounded-full border-2 border-primary"
-                />
+                <div className="w-24 h-24 rounded-full p-1 bg-gradient-to-r from-primary to-secondary">
+                  <Image
+                    src={selectedContributor.avatar_url}
+                    alt={`${selectedContributor.login}'s avatar`}
+                    width={88}
+                    height={88}
+                    className="rounded-full w-full h-full object-cover"
+                  />
+                </div>
                 <div>
                   <h3 className="text-2xl font-bold text-white">
                     {selectedContributor.name || selectedContributor.login}
                   </h3>
                   <p className="text-primary text-lg">@{selectedContributor.login}</p>
+                  <p className="text-white/60 text-sm mt-1">
+                    {getContributorRole(selectedContributor.contributions)}
+                  </p>
                   <div className="flex items-center gap-4 mt-2 text-sm text-white/60">
                     <span>{selectedContributor.contributions} contributions</span>
                     {selectedContributor.public_repos && (
@@ -326,7 +409,7 @@ const Contributors = () => {
               </div>
               <button
                 onClick={closeModal}
-                className="text-white/60 hover:text-white text-2xl"
+                className="text-white/60 hover:text-white text-2xl p-2 hover:bg-white/10 rounded-lg transition-colors"
               >
                 <Icon icon="mdi:close" />
               </button>
@@ -335,7 +418,7 @@ const Contributors = () => {
             {selectedContributor.bio && (
               <div className="mb-6">
                 <h4 className="text-lg font-semibold text-white mb-2">About</h4>
-                <p className="text-white/80">{selectedContributor.bio}</p>
+                <p className="text-white/80 leading-relaxed">{selectedContributor.bio}</p>
               </div>
             )}
 
@@ -359,7 +442,7 @@ const Contributors = () => {
                     href={selectedContributor.blog.startsWith('http') ? selectedContributor.blog : `https://${selectedContributor.blog}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-primary truncate"
+                    className="hover:text-primary truncate transition-colors"
                   >
                     {selectedContributor.blog}
                   </Link>
@@ -372,7 +455,7 @@ const Contributors = () => {
                     href={`https://twitter.com/${selectedContributor.twitter_username}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-primary"
+                    className="hover:text-primary transition-colors"
                   >
                     @{selectedContributor.twitter_username}
                   </Link>
@@ -385,7 +468,7 @@ const Contributors = () => {
                 href={selectedContributor.html_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-primary text-dark px-6 py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors inline-flex items-center gap-2"
+                className="bg-primary text-dark px-6 py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors inline-flex items-center gap-2"
               >
                 <Icon icon="mdi:github" />
                 View Profile
@@ -394,7 +477,7 @@ const Contributors = () => {
                 href={`https://github.com/OpenVoiceX/Web-Voice-marketing-Agent/commits?author=${selectedContributor.login}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="border border-primary text-primary px-6 py-3 rounded-lg font-semibold hover:bg-primary hover:text-dark transition-colors inline-flex items-center gap-2"
+                className="border border-primary text-primary px-6 py-3 rounded-xl font-semibold hover:bg-primary hover:text-dark transition-colors inline-flex items-center gap-2"
               >
                 <Icon icon="mdi:source-commit" />
                 View Contributions
