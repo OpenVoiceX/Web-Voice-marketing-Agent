@@ -39,40 +39,41 @@ const Contributors = () => {
     fetchContributors()
   }, [])
 
+  // Add Esc key handler for modal
+  useEffect(() => {
+    if (selectedContributor) {
+      const handleEscKey = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+          setSelectedContributor(null)
+        }
+      }
+
+      document.addEventListener('keydown', handleEscKey)
+      
+      // Prevent body scroll when modal is open
+      document.body.style.overflow = 'hidden'
+
+      return () => {
+        document.removeEventListener('keydown', handleEscKey)
+        document.body.style.overflow = 'auto'
+      }
+    }
+  }, [selectedContributor])
+
   const fetchContributors = async () => {
     try {
       setLoading(true)
       setError(null)
 
-      // Fetch contributors from GitHub API
-      const contributorsResponse = await fetch(
-        'https://api.github.com/repos/OpenVoiceX/Web-Voice-marketing-Agent/contributors?per_page=100'
-      )
+      // Fetch contributors from our API route
+      const response = await fetch('/api/contributors')
 
-      if (!contributorsResponse.ok) {
+      if (!response.ok) {
         throw new Error('Failed to fetch contributors')
       }
 
-      const contributorsData = await contributorsResponse.json()
-
-      // Fetch detailed info for each contributor
-      const detailedContributors = await Promise.all(
-        contributorsData.map(async (contributor: Contributor) => {
-          try {
-            const userResponse = await fetch(`https://api.github.com/users/${contributor.login}`)
-            if (userResponse.ok) {
-              const userData = await userResponse.json()
-              return { ...contributor, ...userData }
-            }
-            return contributor
-          } catch (error) {
-            console.warn(`Failed to fetch details for ${contributor.login}:`, error)
-            return contributor
-          }
-        })
-      )
-
-      setContributors(detailedContributors)
+      const contributorsData = await response.json()
+      setContributors(contributorsData)
     } catch (error) {
       console.error('Error fetching contributors:', error)
       setError('Failed to load contributors. Please try again later.')
@@ -84,7 +85,7 @@ const Contributors = () => {
 
   // Filtered and searched contributors
   const filteredContributors = useMemo(() => {
-    let filtered = contributors
+    let filtered = [...contributors] // Make a shallow copy to avoid mutating state
 
     // Apply search filter
     if (searchTerm) {
@@ -256,7 +257,16 @@ const Contributors = () => {
                 key={contributor.id}
                 variants={itemVariants}
                 className="group cursor-pointer"
+                role="button"
+                tabIndex={0}
+                aria-label={`View details for ${contributor.name || contributor.login}, ${getContributorRole(contributor.contributions)}`}
                 onClick={() => handleContributorClick(contributor)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    handleContributorClick(contributor)
+                  }
+                }}
               >
                 <div className="bg-dark_grey/30 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center hover:border-primary/30 hover:bg-dark_grey/50 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/10">
                   {/* Profile Image with Border */}
@@ -346,7 +356,7 @@ const Contributors = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="https://github.com/OpenVoiceX/Web-Voice-marketing-Agent"
+                href="https://github.com/Dharmi-dev/Web-Voice-marketing-Agent-dharmesh"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-primary text-dark px-8 py-4 rounded-xl font-semibold hover:bg-primary/90 transition-colors inline-flex items-center gap-2 justify-center"
@@ -355,7 +365,7 @@ const Contributors = () => {
                 View on GitHub
               </Link>
               <Link
-                href="https://github.com/OpenVoiceX/Web-Voice-marketing-Agent/issues"
+                href="https://github.com/Dharmi-dev/Web-Voice-marketing-Agent-dharmesh/issues"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="border border-primary text-primary px-8 py-4 rounded-xl font-semibold hover:bg-primary hover:text-dark transition-colors inline-flex items-center gap-2 justify-center"
@@ -368,14 +378,22 @@ const Contributors = () => {
         </div>
       </section>
 
-      {/* Contributor Detail Modal */}
+      {/* Contributor Detail Modal with proper dialog semantics */}
       {selectedContributor && (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div 
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={() => setSelectedContributor(null)}
+        >
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.9 }}
             className="bg-dark_grey border border-primary/30 rounded-2xl p-8 max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={`contributor-${selectedContributor.id}-title`}
+            aria-describedby={`contributor-${selectedContributor.id}-details`}
+            onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-start mb-6">
               <div className="flex items-center gap-4">
@@ -389,14 +407,20 @@ const Contributors = () => {
                   />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-bold text-white">
+                  <h3 
+                    id={`contributor-${selectedContributor.id}-title`}
+                    className="text-2xl font-bold text-white"
+                  >
                     {selectedContributor.name || selectedContributor.login}
                   </h3>
                   <p className="text-primary text-lg">@{selectedContributor.login}</p>
                   <p className="text-white/60 text-sm mt-1">
                     {getContributorRole(selectedContributor.contributions)}
                   </p>
-                  <div className="flex items-center gap-4 mt-2 text-sm text-white/60">
+                  <div 
+                    id={`contributor-${selectedContributor.id}-details`}
+                    className="flex items-center gap-4 mt-2 text-sm text-white/60"
+                  >
                     <span>{selectedContributor.contributions} contributions</span>
                     {selectedContributor.public_repos && (
                       <span>{selectedContributor.public_repos} repositories</span>
@@ -410,6 +434,7 @@ const Contributors = () => {
               <button
                 onClick={closeModal}
                 className="text-white/60 hover:text-white text-2xl p-2 hover:bg-white/10 rounded-lg transition-colors"
+                aria-label="Close contributor details"
               >
                 <Icon icon="mdi:close" />
               </button>
@@ -439,7 +464,16 @@ const Contributors = () => {
                 <div className="flex items-center gap-2 text-white/80">
                   <Icon icon="mdi:web" className="text-primary" />
                   <Link
-                    href={selectedContributor.blog.startsWith('http') ? selectedContributor.blog : `https://${selectedContributor.blog}`}
+                    href={(() => {
+                      const blog = selectedContributor.blog.trim()
+                      const stripped = blog.replace(/^\/+/, '') // Remove leading slashes
+                      const lowercased = stripped.toLowerCase()
+                      
+                      if (lowercased.startsWith('http://') || lowercased.startsWith('https://')) {
+                        return stripped
+                      }
+                      return `https://${stripped}`
+                    })()}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="hover:text-primary truncate transition-colors"
@@ -474,7 +508,7 @@ const Contributors = () => {
                 View Profile
               </Link>
               <Link
-                href={`https://github.com/OpenVoiceX/Web-Voice-marketing-Agent/commits?author=${selectedContributor.login}`}
+                href={`https://github.com/Dharmi-dev/Web-Voice-marketing-Agent-dharmesh/commits?author=${selectedContributor.login}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="border border-primary text-primary px-6 py-3 rounded-xl font-semibold hover:bg-primary hover:text-dark transition-colors inline-flex items-center gap-2"
