@@ -82,7 +82,7 @@ export async function GET(request: NextRequest) {
 
     // Fetch contributors list
     const contributorsResponse = await fetchWithAuth(
-      'https://api.github.com/repos/Dharmi-dev/Web-Voice-marketing-Agent-dharmesh/contributors?per_page=100'
+      'https://api.github.com/repos/OpenVoiceX/Web-Voice-marketing-Agent/contributors?per_page=100'
     )
 
     if (!contributorsResponse.ok) {

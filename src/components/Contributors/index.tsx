@@ -541,7 +541,7 @@ const Contributors = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="https://github.com/Dharmi-dev/Web-Voice-marketing-Agent-dharmesh"
+                href="https://github.com/OpenVoiceX/Web-Voice-marketing-Agent"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-primary text-dark px-8 py-4 rounded-xl font-semibold hover:bg-primary/90 transition-colors inline-flex items-center gap-2 justify-center"
@@ -550,7 +550,7 @@ const Contributors = () => {
                 View on GitHub
               </Link>
               <Link
-                href="https://github.com/Dharmi-dev/Web-Voice-marketing-Agent-dharmesh/issues"
+                href="https://github.com/OpenVoiceX/Web-Voice-marketing-Agent/issues"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="border border-primary text-primary px-8 py-4 rounded-xl font-semibold hover:bg-primary hover:text-dark transition-colors inline-flex items-center gap-2 justify-center"
@@ -693,7 +693,7 @@ const Contributors = () => {
                 View Profile
               </Link>
               <Link
-                href={`https://github.com/Dharmi-dev/Web-Voice-marketing-Agent-dharmesh/commits?author=${selectedContributor.login}`}
+                href={`https://github.com/OpenVoiceX/Web-Voice-marketing-Agent/commits?author=${selectedContributor.login}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="border border-primary text-primary px-6 py-3 rounded-xl font-semibold hover:bg-primary hover:text-dark transition-colors inline-flex items-center gap-2"
