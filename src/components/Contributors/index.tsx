@@ -25,6 +25,7 @@ interface Contributor {
 }
 
 type FilterType = 'all' | 'core' | 'active' | 'new'
+type ViewMode = 'latest' | 'compact' | 'full'
 
 const Contributors = () => {
   const [contributors, setContributors] = useState<Contributor[]>([])
@@ -33,6 +34,7 @@ const Contributors = () => {
   const [selectedContributor, setSelectedContributor] = useState<Contributor | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState<FilterType>('all')
+  const [viewMode, setViewMode] = useState<ViewMode>('latest')
   const [displayedCount, setDisplayedCount] = useState(8)
 
   useEffect(() => {
@@ -83,13 +85,13 @@ const Contributors = () => {
     }
   }
 
-  // Filtered and searched contributors
-  const filteredContributors = useMemo(() => {
-    let filtered = [...contributors] // Make a shallow copy to avoid mutating state
+  // Get contributors based on view mode
+  const getDisplayedContributors = useMemo(() => {
+    let baseContributors = [...contributors]
 
-    // Apply search filter
+    // Apply search filter first
     if (searchTerm) {
-      filtered = filtered.filter(contributor =>
+      baseContributors = baseContributors.filter(contributor =>
         contributor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
         contributor.login.toLowerCase().includes(searchTerm.toLowerCase()) ||
         contributor.bio?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -100,6 +102,49 @@ const Contributors = () => {
     // Apply category filter
     switch (filterType) {
       case 'core':
+        baseContributors = baseContributors.filter(c => c.contributions >= 10)
+        break
+      case 'active':
+        baseContributors = baseContributors.filter(c => c.contributions >= 5 && c.contributions < 10)
+        break
+      case 'new':
+        baseContributors = baseContributors.filter(c => c.contributions < 5)
+        break
+    }
+
+    // Sort and apply view mode logic
+    const sortedContributors = baseContributors.sort((a, b) => b.contributions - a.contributions)
+
+    switch (viewMode) {
+      case 'latest':
+        // Show top contributors (most active) for latest view
+        return sortedContributors.slice(0, 12)
+      case 'compact':
+        // Show more for compact horizontal view
+        return sortedContributors.slice(0, 24)
+      case 'full':
+        // Show all with pagination
+        return sortedContributors.slice(0, displayedCount)
+      default:
+        return sortedContributors.slice(0, displayedCount)
+    }
+  }, [contributors, searchTerm, filterType, viewMode, displayedCount])
+
+  // Legacy filtered contributors for backward compatibility
+  const filteredContributors = useMemo(() => {
+    let filtered = [...contributors]
+
+    if (searchTerm) {
+      filtered = filtered.filter(contributor =>
+        contributor.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contributor.login.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contributor.bio?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contributor.company?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    }
+
+    switch (filterType) {
+      case 'core':
         filtered = filtered.filter(c => c.contributions >= 10)
         break
       case 'active':
@@ -108,14 +153,12 @@ const Contributors = () => {
       case 'new':
         filtered = filtered.filter(c => c.contributions < 5)
         break
-      default:
-        break
     }
 
     return filtered.sort((a, b) => b.contributions - a.contributions)
   }, [contributors, searchTerm, filterType])
 
-  const displayedContributors = filteredContributors.slice(0, displayedCount)
+  const displayedContributors = getDisplayedContributors
 
   const loadMore = () => {
     setDisplayedCount(prev => Math.min(prev + 8, filteredContributors.length))
@@ -126,6 +169,78 @@ const Contributors = () => {
     if (contributions >= 5) return 'Active Contributor'
     return 'New Contributor'
   }
+
+  // Reusable Contributor Card Component
+  const ContributorCard = ({ 
+    contributor, 
+    onClick, 
+    getContributorRole, 
+    compact = false 
+  }: {
+    contributor: Contributor
+    onClick: () => void
+    getContributorRole: (contributions: number) => string
+    compact?: boolean
+  }) => (
+    <motion.div
+      variants={itemVariants}
+      className="group cursor-pointer"
+      role="button"
+      tabIndex={0}
+      aria-label={`View details for ${contributor.name || contributor.login}, ${getContributorRole(contributor.contributions)}`}
+      onClick={onClick}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          onClick()
+        }
+      }}
+    >
+      <div className={`bg-dark_grey/30 backdrop-blur-sm border border-white/10 rounded-2xl ${compact ? 'p-4' : 'p-6'} text-center hover:border-primary/30 hover:bg-dark_grey/50 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/10`}>
+        {/* Profile Image with Border */}
+        <div className="relative mb-4">
+          <div className={`${compact ? 'w-16 h-16' : 'w-20 h-20'} mx-auto rounded-full p-1 bg-gradient-to-r from-primary to-secondary`}>
+            <Image
+              src={contributor.avatar_url}
+              alt={`${contributor.login}'s avatar`}
+              width={compact ? 60 : 76}
+              height={compact ? 60 : 76}
+              className="rounded-full w-full h-full object-cover"
+            />
+          </div>
+        </div>
+
+        {/* Name and Username */}
+        <h3 className={`font-bold text-white ${compact ? 'text-base' : 'text-lg'} mb-1 truncate`}>
+          {contributor.name || contributor.login}
+        </h3>
+        <p className={`text-primary font-medium mb-3 ${compact ? 'text-xs' : 'text-sm'}`}>
+          {getContributorRole(contributor.contributions)}
+        </p>
+
+        {/* Bio if available and not compact */}
+        {!compact && contributor.bio && (
+          <p className="text-white/60 text-sm mb-4 line-clamp-2 leading-relaxed">
+            {contributor.bio}
+          </p>
+        )}
+
+        {/* Stats */}
+        <div className={`flex items-center justify-center gap-4 ${compact ? 'text-xs' : 'text-xs'} text-white/50`}>
+          <div className="flex items-center gap-1">
+            <Icon icon="mdi:source-commit" />
+            <span>{contributor.contributions}</span>
+          </div>
+          {contributor.public_repos && (
+            <div className="flex items-center gap-1">
+              <Icon icon="mdi:source-repository" />
+              <span>{contributor.public_repos}</span>
+            </div>
+          )}
+        </div>
+      </div>
+    </motion.div>
+  )
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -201,12 +316,66 @@ const Contributors = () => {
             <h1 className="text-5xl md:text-6xl font-bold mb-4 mt-20">
               Contributor <span className="text-primary">Showcase</span>
             </h1>
-            <p className="text-xl text-white/70 mb-12">
-              Meet the amazing people who have contributed to this project
+            <p className="text-xl text-white/70 mb-8">
+              {viewMode === 'latest' && 'Our most active contributors'}
+              {viewMode === 'compact' && 'Browse contributors in compact view'}
+              {viewMode === 'full' && 'Complete list of all contributors'}
             </p>
+            
+            {/* Stats */}
+            <div className="flex items-center justify-center gap-8 text-sm text-white/60 mb-12">
+              <div className="flex items-center gap-2">
+                <Icon icon="mdi:account-group" />
+                <span>{contributors.length} Total Contributors</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Icon icon="mdi:eye" />
+                <span>Showing {displayedContributors.length}</span>
+              </div>
+              {viewMode === 'latest' && (
+                <div className="flex items-center gap-2">
+                  <Icon icon="mdi:star" />
+                  <span>Top Active</span>
+                </div>
+              )}
+            </div>
 
             {/* Search and Filter Section - Inspired by the image */}
-            <div className="flex flex-col md:flex-row gap-4 items-center justify-center max-w-2xl mx-auto">
+            <div className="flex flex-col md:flex-row gap-4 items-center justify-center max-w-4xl mx-auto">
+              {/* View Mode Toggle */}
+              <div className="flex bg-dark_grey/30 rounded-xl p-1 border border-white/10">
+                <button
+                  onClick={() => setViewMode('latest')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    viewMode === 'latest' 
+                      ? 'bg-primary text-dark' 
+                      : 'text-white/70 hover:text-white'
+                  }`}
+                >
+                  Latest
+                </button>
+                <button
+                  onClick={() => setViewMode('compact')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    viewMode === 'compact' 
+                      ? 'bg-primary text-dark' 
+                      : 'text-white/70 hover:text-white'
+                  }`}
+                >
+                  Compact
+                </button>
+                <button
+                  onClick={() => setViewMode('full')}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    viewMode === 'full' 
+                      ? 'bg-primary text-dark' 
+                      : 'text-white/70 hover:text-white'
+                  }`}
+                >
+                  View All
+                </button>
+              </div>
+
               {/* Search Bar */}
               <div className="relative flex-1 w-full md:w-auto">
                 <Icon icon="mdi:magnify" className="absolute left-4 top-1/2 transform -translate-y-1/2 text-white/50 text-xl" />
@@ -219,20 +388,22 @@ const Contributors = () => {
                 />
               </div>
 
-              {/* Filter Dropdown */}
-              <div className="relative">
-                <select
-                  value={filterType}
-                  onChange={(e) => setFilterType(e.target.value as FilterType)}
-                  className="bg-dark_grey/50 border border-white/20 rounded-xl py-4 px-6 pr-12 text-white focus:outline-none focus:border-primary transition-colors appearance-none cursor-pointer min-w-[140px]"
-                >
-                  <option value="all">All Contributors</option>
-                  <option value="core">Core ({contributors.filter(c => c.contributions >= 10).length})</option>
-                  <option value="active">Active ({contributors.filter(c => c.contributions >= 5 && c.contributions < 10).length})</option>
-                  <option value="new">New ({contributors.filter(c => c.contributions < 5).length})</option>
-                </select>
-                <Icon icon="mdi:chevron-down" className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/50 pointer-events-none" />
-              </div>
+              {/* Filter Dropdown - Show only in full view */}
+              {viewMode === 'full' && (
+                <div className="relative">
+                  <select
+                    value={filterType}
+                    onChange={(e) => setFilterType(e.target.value as FilterType)}
+                    className="bg-dark_grey/50 border border-white/20 rounded-xl py-4 px-6 pr-12 text-white focus:outline-none focus:border-primary transition-colors appearance-none cursor-pointer min-w-[140px]"
+                  >
+                    <option value="all">All Contributors</option>
+                    <option value="core">Core ({contributors.filter(c => c.contributions >= 10).length})</option>
+                    <option value="active">Active ({contributors.filter(c => c.contributions >= 5 && c.contributions < 10).length})</option>
+                    <option value="new">New ({contributors.filter(c => c.contributions < 5).length})</option>
+                  </select>
+                  <Icon icon="mdi:chevron-down" className="absolute right-4 top-1/2 transform -translate-y-1/2 text-white/50 pointer-events-none" />
+                </div>
+              )}
             </div>
 
             {/* Results Count */}
@@ -244,79 +415,79 @@ const Contributors = () => {
           </motion.div>
         </div>
 
-        {/* Contributors Grid - Clean design inspired by the image */}
+        {/* Contributors Display - Dynamic Layout */}
         <div className="container mx-auto px-4">
-          <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-7xl mx-auto"
-          >
-            {displayedContributors.map((contributor) => (
+          {/* Latest View - Clean Grid */}
+          {viewMode === 'latest' && (
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-7xl mx-auto"
+            >
+              {displayedContributors.map((contributor) => (
+                <ContributorCard 
+                  key={contributor.id} 
+                  contributor={contributor} 
+                  onClick={() => handleContributorClick(contributor)}
+                  getContributorRole={getContributorRole}
+                />
+              ))}
+            </motion.div>
+          )}
+
+          {/* Compact View - Horizontal Scroll */}
+          {viewMode === 'compact' && (
+            <div className="overflow-x-auto pb-4">
               <motion.div
-                key={contributor.id}
-                variants={itemVariants}
-                className="group cursor-pointer"
-                role="button"
-                tabIndex={0}
-                aria-label={`View details for ${contributor.name || contributor.login}, ${getContributorRole(contributor.contributions)}`}
-                onClick={() => handleContributorClick(contributor)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    handleContributorClick(contributor)
-                  }
-                }}
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                className="flex gap-6 w-max"
+                style={{ minWidth: '100%' }}
               >
-                <div className="bg-dark_grey/30 backdrop-blur-sm border border-white/10 rounded-2xl p-6 text-center hover:border-primary/30 hover:bg-dark_grey/50 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-primary/10">
-                  {/* Profile Image with Border */}
-                  <div className="relative mb-6">
-                    <div className="w-20 h-20 mx-auto rounded-full p-1 bg-gradient-to-r from-primary to-secondary">
-                      <Image
-                        src={contributor.avatar_url}
-                        alt={`${contributor.login}'s avatar`}
-                        width={76}
-                        height={76}
-                        className="rounded-full w-full h-full object-cover"
-                      />
-                    </div>
+                {displayedContributors.map((contributor) => (
+                  <div key={contributor.id} className="flex-shrink-0 w-64">
+                    <ContributorCard 
+                      contributor={contributor} 
+                      onClick={() => handleContributorClick(contributor)}
+                      getContributorRole={getContributorRole}
+                      compact={true}
+                    />
                   </div>
-
-                  {/* Name and Username */}
-                  <h3 className="font-bold text-white text-lg mb-1 truncate">
-                    {contributor.name || contributor.login}
-                  </h3>
-                  <p className="text-primary font-medium mb-3 text-sm">
-                    {getContributorRole(contributor.contributions)}
-                  </p>
-
-                  {/* Bio if available */}
-                  {contributor.bio && (
-                    <p className="text-white/60 text-sm mb-4 line-clamp-2 leading-relaxed">
-                      {contributor.bio}
-                    </p>
-                  )}
-
-                  {/* Stats */}
-                  <div className="flex items-center justify-center gap-4 text-xs text-white/50">
-                    <div className="flex items-center gap-1">
-                      <Icon icon="mdi:source-commit" />
-                      <span>{contributor.contributions}</span>
-                    </div>
-                    {contributor.public_repos && (
-                      <div className="flex items-center gap-1">
-                        <Icon icon="mdi:source-repository" />
-                        <span>{contributor.public_repos}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                ))}
               </motion.div>
-            ))}
-          </motion.div>
+              {/* Scroll indicator */}
+              <div className="flex justify-center mt-4">
+                <p className="text-white/50 text-sm flex items-center gap-2">
+                  <Icon icon="mdi:arrow-left-right" />
+                  Scroll horizontally to see more
+                </p>
+              </div>
+            </div>
+          )}
 
-          {/* Load More Button - Inspired by the image */}
-          {displayedCount < filteredContributors.length && (
+          {/* Full View - Grid with Pagination */}
+          {viewMode === 'full' && (
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 max-w-7xl mx-auto"
+            >
+              {displayedContributors.map((contributor) => (
+                <ContributorCard 
+                  key={contributor.id} 
+                  contributor={contributor} 
+                  onClick={() => handleContributorClick(contributor)}
+                  getContributorRole={getContributorRole}
+                />
+              ))}
+            </motion.div>
+          )}
+
+          {/* Load More Button - Only show in full view */}
+          {viewMode === 'full' && displayedCount < filteredContributors.length && (
             <div className="text-center mt-12">
               <motion.button
                 initial={{ opacity: 0, y: 20 }}
@@ -324,7 +495,21 @@ const Contributors = () => {
                 onClick={loadMore}
                 className="bg-primary text-dark px-8 py-4 rounded-xl font-semibold hover:bg-primary/90 transition-all duration-300 hover:scale-105 shadow-lg"
               >
-                Load More
+                Load More ({filteredContributors.length - displayedCount} remaining)
+              </motion.button>
+            </div>
+          )}
+
+          {/* View All Button for Latest/Compact views */}
+          {(viewMode === 'latest' || viewMode === 'compact') && filteredContributors.length > displayedContributors.length && (
+            <div className="text-center mt-12">
+              <motion.button
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                onClick={() => setViewMode('full')}
+                className="border border-primary text-primary px-8 py-4 rounded-xl font-semibold hover:bg-primary hover:text-dark transition-all duration-300 hover:scale-105"
+              >
+                View All {contributors.length} Contributors
               </motion.button>
             </div>
           )}
