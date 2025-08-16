@@ -1,5 +1,6 @@
 'use client'
 import Image from 'next/image'
+import { Icon } from '@iconify/react'
 import { timelineData } from '@/app/api/data'
 import { motion } from 'framer-motion'
 
@@ -101,9 +102,9 @@ const TimeLine = () => {
               {timelineData.map((item, index) => (
                 <div key={index} className="flex items-center gap-6">
                   <div className="bg-light_grey/45 p-6 rounded-full">
-                    <Image
-                      src={item.icon}
-                      alt={item.title}
+                    <Icon
+                      icon={item.icon}
+                      className="text-primary"
                       width={44}
                       height={44}
                     />
