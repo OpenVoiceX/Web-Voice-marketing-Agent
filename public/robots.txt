@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Important pages
+Allow: /contributors
+Allow: /documentation
+
+# Sitemaps
+Sitemap: https://voice-marketing-agents.vercel.app/sitemap.xml
+
+# Crawl-delay for respectful crawling
+Crawl-delay: 1
