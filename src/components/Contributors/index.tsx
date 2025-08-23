@@ -202,7 +202,7 @@ const Contributors = () => {
           <div className={`${compact ? 'w-16 h-16' : 'w-20 h-20'} mx-auto rounded-full p-1 bg-gradient-to-r from-primary to-secondary`}>
             <Image
               src={contributor.avatar_url}
-              alt={`${contributor.login}'s avatar`}
+              alt={`${contributor.login}&apos;s avatar`}
               width={compact ? 60 : 76}
               height={compact ? 60 : 76}
               className="rounded-full w-full h-full object-cover"
@@ -212,7 +212,7 @@ const Contributors = () => {
 
         {/* Name and Username */}
         <h3 className={`font-bold text-white ${compact ? 'text-base' : 'text-lg'} mb-1 truncate`}>
-          {contributor.name || contributor.login}
+          {contributor.name?.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') || contributor.login}
         </h3>
         <p className={`text-primary font-medium mb-3 ${compact ? 'text-xs' : 'text-sm'}`}>
           {getContributorRole(contributor.contributions)}
@@ -221,7 +221,7 @@ const Contributors = () => {
         {/* Bio if available and not compact */}
         {!compact && contributor.bio && (
           <p className="text-white/60 text-sm mb-4 line-clamp-2 leading-relaxed">
-            {contributor.bio}
+            {contributor.bio.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}
           </p>
         )}
 
@@ -409,7 +409,7 @@ const Contributors = () => {
             {/* Results Count */}
             {searchTerm && (
               <p className="text-white/60 mt-4">
-                Found {filteredContributors.length} contributor{filteredContributors.length !== 1 ? 's' : ''} matching "{searchTerm}"
+                Found {filteredContributors.length} contributor{filteredContributors.length !== 1 ? 's' : ''} matching &quot;{searchTerm}&quot;
               </p>
             )}
           </motion.div>
@@ -536,7 +536,7 @@ const Contributors = () => {
               Want to Join Our <span className="text-primary">Community</span>?
             </h2>
             <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-              We're always looking for passionate developers to help us build the future of voice AI. 
+              We&apos;re always looking for passionate developers to help us build the future of voice AI. 
               Every contribution, no matter how small, makes a difference!
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -553,7 +553,7 @@ const Contributors = () => {
                 href="https://github.com/OpenVoiceX/Web-Voice-marketing-Agent/issues"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="border border-primary text-primary px-8 py-4 rounded-xl font-semibold hover:bg-primary hover:text-dark transition-colors inline-flex items-center gap-2 justify-center"
+                className="border border-primary text-primary px-6 py-3 rounded-xl font-semibold hover:bg-primary hover:text-dark transition-colors inline-flex items-center gap-2 justify-center"
               >
                 <Icon icon="mdi:bug" className="text-xl" />
                 Report Issues
@@ -585,7 +585,7 @@ const Contributors = () => {
                 <div className="w-24 h-24 rounded-full p-1 bg-gradient-to-r from-primary to-secondary">
                   <Image
                     src={selectedContributor.avatar_url}
-                    alt={`${selectedContributor.login}'s avatar`}
+                    alt={`${selectedContributor.login}&apos;s avatar`}
                     width={88}
                     height={88}
                     className="rounded-full w-full h-full object-cover"
@@ -596,7 +596,7 @@ const Contributors = () => {
                     id={`contributor-${selectedContributor.id}-title`}
                     className="text-2xl font-bold text-white"
                   >
-                    {selectedContributor.name || selectedContributor.login}
+                    {selectedContributor.name?.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;') || selectedContributor.login}
                   </h3>
                   <p className="text-primary text-lg">@{selectedContributor.login}</p>
                   <p className="text-white/60 text-sm mt-1">
@@ -628,7 +628,7 @@ const Contributors = () => {
             {selectedContributor.bio && (
               <div className="mb-6">
                 <h4 className="text-lg font-semibold text-white mb-2">About</h4>
-                <p className="text-white/80 leading-relaxed">{selectedContributor.bio}</p>
+                <p className="text-white/80 leading-relaxed">{selectedContributor.bio.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}</p>
               </div>
             )}
 
@@ -636,13 +636,13 @@ const Contributors = () => {
               {selectedContributor.company && (
                 <div className="flex items-center gap-2 text-white/80">
                   <Icon icon="mdi:office-building" className="text-primary" />
-                  <span>{selectedContributor.company}</span>
+                  <span>{selectedContributor.company.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}</span>
                 </div>
               )}
               {selectedContributor.location && (
                 <div className="flex items-center gap-2 text-white/80">
                   <Icon icon="mdi:map-marker" className="text-primary" />
-                  <span>{selectedContributor.location}</span>
+                  <span>{selectedContributor.location.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')}</span>
                 </div>
               )}
               {selectedContributor.blog && (

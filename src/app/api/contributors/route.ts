@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
 interface Contributor {
   login: string
@@ -69,7 +69,7 @@ async function fetchUserDetails(usernames: string[], maxConcurrency = 5): Promis
   return results
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     // Check cache first
     if (cachedData && Date.now() - cachedData.timestamp < CACHE_DURATION) {
